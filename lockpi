@@ -1,0 +1,60 @@
+
+import binascii
+import sys
+
+import Adafruit_PN532 as PN532
+import RPi.GPIO as GPIO
+import time
+# Setup GPIO Pins
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(21, GPIO.OUT)
+GPIO.setup(4, GPIO.OUT)
+CS   = 18
+MOSI = 23
+MISO = 24
+SCLK = 25
+#GPIO.cleanup()
+GPIO.output(4, True)
+GPIO.output(21,True)
+# Create an instance of the PN532 class.
+pn532 = PN532.PN532(cs=CS, sclk=SCLK, mosi=MOSI, miso=MISO)
+
+# Call begin to initialize communication with the PN532.  Must be done before
+# any other calls to the PN532!
+pn532.begin()
+
+# Configure PN532 to communicate with MiFare cards.
+pn532.SAM_configuration()
+
+# Main loop to detect cards and read a block.
+
+S = 1
+while (S == 1):
+    print('Waiting for MiFare card...')
+    # Check if a card is available to read.
+    uid = pn532.read_passive_target()
+    # Try again if no card is available.
+    if uid is None:
+        continue
+    print('Found card with UID: 0x{0}'.format(binascii.hexlify(uid)))
+    data = pn532.mifare_classic_read_block(4)
+    if (uid == uid):
+        GPIO.setup(21, GPIO.OUT)
+        GPIO.setup(4, GPIO.OUT)
+        GPIO.output(4, True)
+        GPIO.output(21,False)
+        time.sleep(3)
+        GPIO.output(21,True)
+        time.sleep(3)
+        continue
+    else:
+        GPIO.setup(21, GPIO.OUT)
+        GPIO.setup(4, GPIO.OUT)
+        GPIO.output(4,False)
+        time.sleep(1)
+        GPIO.output(4,True)
+        time.sleep(1)
+        continue
+        
+
+        
